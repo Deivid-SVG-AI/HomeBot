@@ -1,0 +1,130 @@
+# Configuración de Búho. Copia este archivo a config.yaml y ajústalo.
+# Las horas van entre comillas ("14:00"): sin ellas YAML las lee como números.
+# Las palabras clave van sin acentos; la comparación ignora mayúsculas y acentos.
+
+timezone: America/Hermosillo
+location: {name: Hermosillo, lat: 29.07, lon: -110.96}
+
+schedule:
+  weather_weekdays: "06:00"      # lunes a viernes
+  weather_weekends: "09:00"      # sabado y domingo
+  weather_late_limit: "10:00"    # si la Pi arranco tarde, enviar hasta esta hora
+  digests: ["14:00", "20:00"]
+  quiet_hours: {start: "23:00", end: "06:00"}
+
+limits:
+  max_red_per_hour: 6
+  red_rule_cooldown_hours: 12
+  digest_max_per_category: 8
+  max_item_age_hours: 48
+  catchup_red_max_age_hours: 6
+  retention_days: 30
+
+hot_news:
+  window_hours: 3
+  to_yellow_min_sources: 2
+  to_red_min_sources: 3          # solo unison y hermosillo
+
+weather_alerts:
+  gust_kmh: 60
+  heat_c: 43
+  rain_probability: 70
+  storm_weather_codes: [95, 96, 99]
+
+categories:
+  unison:
+    red: ["suspension de clases", "suspenden clases", "suspension de actividades",
+          "paro", "huelga", "cierre de campus", "reinscripcion", "resultados de admision"]
+    yellow: ["unison", "universidad de sonora", "convocatoria", "becas",
+             "calendario escolar", "inscripciones"]
+    personal_keywords: []        # mi carrera o division
+    deprioritize: ["navojoa", "cajeme", "nogales", "caborca", "santa ana"]
+  hermosillo:
+    red: ["suspenden clases", "proteccion civil", "huracan", "tormenta tropical",
+          "evacuacion", "corte de agua", "sin agua", "apagon"]
+    yellow: ["hermosillo", "agua de hermosillo", "cfe", "cierre vial", "lluvia"]
+    exclude: ["horoscopo"]
+  videojuegos:
+    red: ["nintendo direct", "state of play"]
+    yellow: ["monster hunter", "capcom", "playstation", "ps5", "switch 2",
+             "zelda", "mario", "pokemon"]
+    low_weight: ["announced", "anuncia", "release date", "fecha de lanzamiento", "trailer"]
+    official_red_sources: ["steam_mhwilds", "steam_mhascendance"]
+
+# Campos de cada fuente:
+#   id                corto, [a-z0-9_] (viaja en los botones de Telegram)
+#   name              nombre que se muestra en los mensajes
+#   type              rss (necesita url) | gnews (query) | steam (appid) | unison (url)
+#   category          unison | hermosillo | videojuegos
+#   interval_minutes  cada cuánto se descarga (Google News: mínimo 30)
+#   timeout_seconds   opcional, 15 por defecto
+#   official          opcional; true = fuente oficial de su categoría
+# Para agregar un feed RSS basta con una entrada nueva.
+sources:
+  # El Imparcial por sección (verificado 2026-09-27). El de Sonora trae solo 13 de las 22
+  # notas de Hermosillo: por eso son dos fuentes.
+  - id: elimparcial_hmo
+    name: El Imparcial
+    type: rss
+    url: https://www.elimparcial.com/arc/outboundfeeds/rss/category/son/hermosillo/?outputType=xml
+    category: hermosillo
+    interval_minutes: 10
+
+  - id: elimparcial_son
+    name: El Imparcial
+    type: rss
+    url: https://www.elimparcial.com/arc/outboundfeeds/rss/category/son/sonora/?outputType=xml
+    category: hermosillo
+    interval_minutes: 10
+
+  # Noticias oficiales: el listado HTML del sitio (WordPress y su API están abandonados).
+  - id: unison
+    name: Unison
+    type: unison
+    url: https://www.unison.mx/noticias-anteriores/
+    category: unison
+    interval_minutes: 15
+    official: true
+
+  - id: gnews_unison
+    name: Google News
+    type: gnews
+    query: '"Universidad de Sonora" OR Unison when:1d'
+    category: unison
+    interval_minutes: 30
+
+  - id: gnews_hmo
+    name: Google News
+    type: gnews
+    query: Hermosillo when:1d
+    category: hermosillo
+    interval_minutes: 30
+
+  - id: ps_latam
+    name: PlayStation LATAM
+    type: rss
+    url: https://blog.latam.playstation.com/feed/
+    category: videojuegos
+    interval_minutes: 30
+    official: true
+
+  - id: nintendolife
+    name: Nintendo Life
+    type: rss
+    url: https://www.nintendolife.com/feeds/latest
+    category: videojuegos
+    interval_minutes: 30
+
+  - id: steam_mhwilds
+    name: Monster Hunter Wilds
+    type: steam
+    appid: 2246340
+    category: videojuegos
+    interval_minutes: 60
+
+  - id: steam_mhascendance
+    name: "Monster Hunter Wilds: Ascendance"
+    type: steam
+    appid: 4829700
+    category: videojuegos
+    interval_minutes: 60

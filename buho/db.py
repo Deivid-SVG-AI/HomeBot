@@ -4,6 +4,7 @@ Las fechas se guardan como texto ISO 8601 en UTC.
 """
 
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 
 # Una entrada por versión del esquema (PRAGMA user_version). Nunca edites una
@@ -129,3 +130,25 @@ def migrate(conn: sqlite3.Connection) -> None:
 def has_fts(conn: sqlite3.Connection) -> bool:
     row = conn.execute("SELECT 1 FROM sqlite_master WHERE name = 'items_fts'").fetchone()
     return row is not None
+
+
+def get_state(conn: sqlite3.Connection, key: str) -> str | None:
+    row = conn.execute("SELECT value FROM app_state WHERE key = ?", (key,)).fetchone()
+    return row[0] if row else None
+
+
+def set_state(conn: sqlite3.Connection, key: str, value: str) -> None:
+    conn.execute("INSERT OR REPLACE INTO app_state (key, value) VALUES (?, ?)", (key, value))
+
+
+def record_sent(
+    conn: sqlite3.Connection,
+    kind: str,
+    message_id: int | None,
+    now: datetime,
+    cluster_id: int | None = None,
+) -> None:
+    conn.execute(
+        "INSERT INTO sent_messages (kind, tg_message_id, cluster_id, sent_at) VALUES (?, ?, ?, ?)",
+        (kind, message_id, cluster_id, now.isoformat()),
+    )

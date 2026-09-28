@@ -1,10 +1,11 @@
+import os
 from datetime import time
 from pathlib import Path
 
 import pytest
 import yaml
 
-from buho.config import ConfigError, load_config
+from buho.config import ConfigError, load_config, load_dotenv, read_env
 
 EXAMPLE = Path(__file__).parent.parent / "config.example.yaml"
 
@@ -60,3 +61,21 @@ def test_errors_are_explained_in_spanish(tmp_path: Path, change, expected: str) 
 def test_missing_file_explains_what_to_do(tmp_path: Path) -> None:
     with pytest.raises(ConfigError, match="Copia config.example.yaml"):
         load_config(tmp_path / "config.yaml")
+
+
+def test_dotenv_does_not_override_environment(tmp_path: Path, monkeypatch) -> None:
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "# comentario\nTELEGRAM_BOT_TOKEN='123:abc'\nTELEGRAM_CHAT_ID=42\nBUHO_DRY_RUN=0\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(os, "environ", {"BUHO_DRY_RUN": "1"})  # entorno aislado
+    load_dotenv(env_file)
+    env = read_env()
+    assert (env.token, env.chat_id, env.dry_run) == ("123:abc", 42, True)
+
+
+def test_bad_chat_id_is_explained(monkeypatch) -> None:
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "mi-chat")
+    with pytest.raises(ConfigError, match="debe ser un número"):
+        read_env()

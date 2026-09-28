@@ -1,6 +1,8 @@
 """Carga y validación de config.yaml, con errores explicados en español."""
 
+import os
 import re
+from dataclasses import dataclass
 from datetime import time
 from pathlib import Path
 from typing import Annotated, Literal
@@ -201,3 +203,43 @@ def load_config(path: Path) -> Config:
     except ValidationError as e:
         lines = "\n".join(_explain(err) for err in e.errors())
         raise ConfigError(f"{path} tiene {e.error_count()} error(es):\n{lines}") from None
+
+
+def load_dotenv(path: Path = Path(".env")) -> None:
+    """Carga KEY=VALUE de .env sin pisar lo que ya exista en el entorno.
+
+    En la Pi las variables llegan de systemd (EnvironmentFile), así que no se lee.
+    """
+    if "TELEGRAM_BOT_TOKEN" in os.environ:
+        return
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:  # no existe, o es el .env de la Pi (solo root) y no hace falta
+        return
+    for line in text.splitlines():
+        key, sep, value = line.partition("=")
+        key = key.strip()
+        if sep and key and not key.startswith("#"):
+            os.environ.setdefault(key, value.strip().strip("\"'"))
+
+
+@dataclass
+class Env:
+    token: str | None
+    chat_id: int | None  # None = modo configuración: /start responde con el chat id
+    dry_run: bool
+    data_dir: Path
+
+
+def read_env() -> Env:
+    chat = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+    try:
+        chat_id = int(chat) if chat else None
+    except ValueError:
+        raise ConfigError(f"TELEGRAM_CHAT_ID debe ser un número; en .env dice {chat!r}") from None
+    return Env(
+        token=os.environ.get("TELEGRAM_BOT_TOKEN", "").strip() or None,
+        chat_id=chat_id,
+        dry_run=os.environ.get("BUHO_DRY_RUN", "").strip() == "1",
+        data_dir=Path(os.environ.get("BUHO_DATA_DIR", "data")),
+    )

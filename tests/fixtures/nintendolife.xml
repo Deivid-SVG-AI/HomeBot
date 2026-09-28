@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<title>Nintendo Life | Latest Updates</title>
+		<link>https://www.nintendolife.com/feeds/latest</link>
+		<description></description>
+		<language>en</language>
+		<copyright>(c) 2026 Hookshot Media</copyright>
+		<lastBuildDate>Mon, 28 Sep 2026 04:40:00 GMT</lastBuildDate>
+		<docs>https://www.nintendolife.com/feeds</docs>
+		<generator>dgpCMS/1.0 https://hookshot.media</generator>
+		<webMaster>help@nintendolife.com (Nintendo Life)</webMaster>
+		<ttl>5</ttl>
+		<image>
+			<url>https://images.nintendolife.com/site/icon/128x128.png</url>
+			<title>Nintendo Life</title>
+			<link>https://www.nintendolife.com/</link>
+			<width>128</width>
+			<height>128</height>
+		</image>
+		<atom:link href="https://www.nintendolife.com/feeds/latest" rel="self" type="application/rss+xml" />
+		<item>
+			<pubDate>Sun, 27 Sep 2026 15:00:00 GMT</pubDate>
+			<title>Opinion: I Played Mario Kart Tour Every Day For Seven Years, And What Am I Left With?</title>
+			<description><![CDATA[<p><strong>Chequered flag.</strong></p><p>On 24th September 2019, Nintendo launched <a href="https://www.nintendolife.com/games/mobile/mario_kart_tour">Mario Kart Tour</a> for mobile devices. This was Mario’s second outing in mobile gaming, following 2016’s <a href="https://www.nintendolife.com/games/mobile/super_mario_run">Super Mario Run</a>, which had an impressive initial reception but seeming]]></description>
+			<guid isPermaLink="false">https://www.nintendolife.com/#article-206448</guid>
+			<link>https://www.nintendolife.com/features/opinion-i-played-mario-kart-tour-every-day-for-seven-years-and-what-am-i-left-with</link>
+			
+			
+		</item>
+<item>
+			<pubDate>Sun, 27 Sep 2026 12:00:00 GMT</pubDate>
+			<title>Review: Voidjoy GA-10 Elite Extender For Switch Pro Controller - The Pros Don&#039;t Outweigh The (Mod) Cons</title>
+			<description><![CDATA[<p><strong>Voidco.</strong></p><p>With the price of consoles, controllers, games, groceries — <em>everything</em> — shooting up over the last few years, you're likely keen to save pennies where you can. It's one thing to push the boat out for a new Switch 2, but add-ons and accessories can stretch budgets to breaking point. Is a $90 / £75 Pro Controller 2 <em>really</em> an essential purchase when]]></description>
+			<guid isPermaLink="false">https://www.nintendolife.com/#article-205822</guid>
+			<link>https://www.nintendolife.com/reviews/voidjoy-ga-10-elite-extender-for-switch-pro-controller-the-pros-dont-outweigh-the-mod-cons</link>
+			
+			
+		</item>
+<item>
+			<pubDate>Sun, 27 Sep 2026 09:00:00 GMT</pubDate>
+			<title>Feature: Box Art Brawl - Duel: Dragon Quest II (NES)</title>
+			<description><![CDATA[<p><strong>The quest continues.</strong></p><p>Strap in, because it's time for another edition of <a href="https://www.nintendolife.com/tags/box-art-brawl">Box Art Brawl</a>!</p><p><a href="https://www.nintendolife.com/features/box-art-brawl-duel-cubivore-survival-of-the-fittest">Last time</a>, we put the GameCube curio <a href="https://www.nintendolife.com/games/gamecube/cubivore_survival_of_the_]]></description>
+			<guid isPermaLink="false">https://www.nintendolife.com/#article-206817</guid>
+			<link>https://www.nintendolife.com/features/box-art-brawl-duel-dragon-quest-ii-nes</link>
+			
+			
+		</item>
+	</channel>
+</rss>

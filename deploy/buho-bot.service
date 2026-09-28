@@ -1,0 +1,34 @@
+# Unidad systemd de Búho. La copia deploy/install_pi.sh a /etc/systemd/system/.
+[Unit]
+Description=Búho: bot personal de Telegram
+# La Pi no tiene reloj propio: esperar la red y la hora sincronizada
+# (install_pi.sh habilita systemd-time-wait-sync para que time-sync.target espere de verdad).
+Wants=network-online.target
+After=network-online.target time-sync.target
+
+[Service]
+Type=simple
+User=buho
+Group=buho
+# vcgencmd (aviso de bajo voltaje en /estado) necesita el grupo video.
+SupplementaryGroups=video
+WorkingDirectory=/opt/buho
+EnvironmentFile=/opt/buho/.env
+Environment=BUHO_DATA_DIR=/var/lib/buho
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/buho/.venv/bin/python -m buho run
+Restart=on-failure
+RestartSec=30
+MemoryMax=300M
+
+# Endurecimiento: solo puede escribir en su directorio de datos.
+StateDirectory=buho
+StateDirectoryMode=0750
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/buho
+
+[Install]
+WantedBy=multi-user.target

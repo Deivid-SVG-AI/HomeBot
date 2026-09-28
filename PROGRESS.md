@@ -99,6 +99,8 @@
   bloqueos con WAL). Conviene moverlo o excluir esas carpetas.
 - **Fase 1:** antes de escribir los scripts de despliegue, preguntar cómo llega el código a la Pi
   (GitHub o SSH) y si hay SSH con llave. Confirmar el Python de la Pi (se espera 3.13 en Trixie).
+  Git en la PC tiene `core.autocrlf`: agregar `.gitattributes` con `eol=lf` para `.sh` y las
+  unidades systemd, o bash fallará en la Pi si se copian por SSH.
 - **Fase 2, notas para afinar reglas:**
   - `elimparcial_son` también trae notas de `/mexico/` y de otras ciudades; aplicarles la regla
     de `/son/sonora/` (entran solo si mencionan Hermosillo o la Unison, o si activan una regla roja).

@@ -2,8 +2,8 @@
 
 | Fase | Estado |
 |---|---|
-| 0 — Base y validación de fuentes | ✅ Terminada el 2026-09-27; esperando revisión |
-| 1 — Clima y bot mínimo en la Pi | ⏳ Siguiente, cuando el usuario dé el OK |
+| 0 — Base y validación de fuentes | ✅ Terminada el 2026-09-27 |
+| 1 — Clima y bot mínimo en la Pi | 🟡 Código listo el 2026-09-27; falta instalarlo en la Pi y recibir el clima |
 | 2 — Noticias | — |
 | 3 — Dashboard | — |
 | 4 — IA opcional | — |
@@ -21,13 +21,37 @@
 - Fixtures reales recortadas en `tests/fixtures/` (3 a 10 KB cada una). `open_meteo.json` es para la
   Fase 1.
 
+## Fase 1 — qué se hizo
+
+- `buho/weather.py`: descarga de Open-Meteo, mensaje del día con consejos, horario por día de la
+  semana (`weather_time`, `weather_due`) y `send_daily_if_due`, que envía una sola vez al día
+  aunque haya reinicios, y también si la Pi arranca tarde (antes de las 10:00).
+- `buho/bot.py`:
+  - solo atiende al chat de `TELEGRAM_CHAT_ID` (un `TypeHandler` en el grupo −1 ignora y registra
+    los demás);
+  - modo configuración: sin chat id, `/start` responde con el id del chat;
+  - comandos `/start`, `/ayuda`, `/clima [manana]` y `/estado`, registrados con `set_my_commands`;
+  - un reloj de un minuto que dispara el clima;
+  - apagado limpio con SIGTERM (lo maneja `run_polling`).
+- `buho/notify.py`: envío en HTML sin vista previa; ante un 429 espera `retry_after` y reintenta.
+- CLI: `run` (con `BUHO_DRY_RUN=1` imprime en consola y no se conecta a Telegram), `send-test` y
+  `preview-weather`.
+- Despliegue:
+  - `deploy/install_pi.sh` (idempotente), `deploy/update.sh` y `deploy/buho-bot.service`;
+  - `.env.example` y `.gitattributes` (`.sh` y `.service` siempre con LF);
+  - `README.md` completo, en español.
+
 ## Cómo probarlo
 
 ```powershell
-.venv\Scripts\python -m pytest                   # 27 pruebas, sin red
+.venv\Scripts\python -m pytest                   # 56 pruebas, sin red
 .venv\Scripts\python -m ruff check .
 .venv\Scripts\python -m buho check-sources       # necesita config.yaml (copia del ejemplo)
+.venv\Scripts\python -m buho preview-weather     # clima real, sin enviar
 ```
+
+En la Pi: seguir el README (secciones 1 a 3). La Fase 1 queda aceptada cuando llegue el clima a
+Telegram desde la Pi.
 
 ## Decisiones vigentes
 
@@ -52,6 +76,26 @@
   hora se agrupa.
 - **Primero se envía y luego se registra.** Un corte de luz entre ambos pasos podría repetir un
   mensaje; se prefiere eso a perder una 🔴.
+
+### Fase 1 (2026-09-27)
+
+- **Despliegue por GitHub:**
+  - El usuario clona en `/opt/buho` con una llave de despliegue de solo lectura y actualiza con
+    `deploy/update.sh` (`git pull` + `install_pi.sh`).
+  - No hay SSH de la PC a la Pi.
+  - Los datos viven en `/var/lib/buho` (`StateDirectory` de systemd).
+- **Secretos:** en la Pi, `/opt/buho/.env` es de root con permisos 600 y systemd lo pasa con
+  `EnvironmentFile=`. En la PC, `load_dotenv()` lo lee sin pisar el entorno.
+- **Simulación sin Telegram:** con `BUHO_DRY_RUN=1`, `run` solo corre el reloj y los mensajes
+  programados se imprimen. Los comandos se prueban con el bot real.
+- **Consejos del clima:**
+  - Orden: calor (máxima ≥ 40 °C), rachas ≥ 50 km/h, lluvia ≥ 60 % y UV ≥ 8; máximo dos.
+  - Los periodos son mañana (6–12), tarde (12–18) y noche (18–24); la madrugada no se muestra.
+  - El UV se redondea antes de clasificarlo (escala de la OMS).
+- **`/clima`:** la temperatura de "Ahora" es la del pronóstico por hora de la hora actual; los
+  periodos que ya pasaron se omiten.
+- **Alertas 🔴 de clima (sección 2):** pasan a la Fase 2, porque dependen de la política de 🔴
+  (silencio, horario silencioso, límite por hora). No estaban en la lista de la Fase 1.
 
 ### Esquema de la BD (v1, `buho/db.py`)
 
@@ -97,10 +141,15 @@
   404 sin autenticación. No se ha hecho push; se pregunta antes de cada push.
 - **Pregunta abierta:** el proyecto está en OneDrive, que sincroniza `.venv` y la BD (riesgo de
   bloqueos con WAL). Conviene moverlo o excluir esas carpetas.
-- **Fase 1:** antes de escribir los scripts de despliegue, preguntar cómo llega el código a la Pi
-  (GitHub o SSH) y si hay SSH con llave. Confirmar el Python de la Pi (se espera 3.13 en Trixie).
-  Git en la PC tiene `core.autocrlf`: agregar `.gitattributes` con `eol=lf` para `.sh` y las
-  unidades systemd, o bash fallará en la Pi si se copian por SSH.
+- **Fase 1, por verificar en la Pi (lo hace el usuario):**
+  - `install_pi.sh` termina sin errores (exige Python 3.11 o superior; se espera 3.13 en Trixie);
+  - `/clima`, `/estado` y `send-test` funcionan;
+  - el clima llega solo a las 06:00, o a las 09:00 en fin de semana;
+  - `/estado` muestra la memoria (objetivo: menos de 150 MB), la temperatura del CPU y el voltaje
+    (si no aparece el voltaje, revisar `vcgencmd`);
+  - ver si `install_pi.sh` avisa que el control de memoria está apagado (`MemoryMax`).
+- **Fase 2:** agregar las alertas 🔴 de clima (revisión cada hora, umbrales de `weather_alerts`,
+  una sola por evento) y la sección de fuentes en `/estado`.
 - **Fase 2, notas para afinar reglas:**
   - `elimparcial_son` también trae notas de `/mexico/` y de otras ciudades; aplicarles la regla
     de `/son/sonora/` (entran solo si mencionan Hermosillo o la Unison, o si activan una regla roja).

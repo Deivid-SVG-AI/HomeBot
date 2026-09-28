@@ -15,7 +15,7 @@ Hermosillo y de videojuegos.
 .venv\Scripts\python -m ruff format .; .venv\Scripts\python -m ruff check .
 Copy-Item config.example.yaml config.yaml                       # primera vez
 .venv\Scripts\python -m buho check-sources                      # valida las fuentes reales
-$env:BUHO_DRY_RUN=1; .venv\Scripts\python -m buho run           # simulación (desde la Fase 1)
+$env:BUHO_DRY_RUN=1; .venv\Scripts\python -m buho run           # simulación: imprime en vez de enviar
 ```
 
 ## Convenciones
@@ -29,6 +29,8 @@ $env:BUHO_DRY_RUN=1; .venv\Scripts\python -m buho run           # simulación (d
 - El token nunca va a los logs (el logger de httpx va en WARNING).
 - Trabajo por fases. Al cerrar cada una: ruff + pytest, commit, actualizar PROGRESS.md y
   detenerse a revisión. No empezar la siguiente sin el OK del usuario.
-- Preguntar antes de: instalar fuera del venv, hacer push, ejecutar comandos en la Pi, ampliar el
-  alcance o tomar decisiones difíciles de revertir. Nunca pedir secretos en el chat: decir en qué
-  archivo van.
+- Preguntar antes de: instalar fuera del venv, ejecutar comandos en la Pi, ampliar el alcance o
+  tomar decisiones difíciles de revertir. Nunca pedir secretos en el chat: decir en qué archivo van.
+- Despliegue: hacer push a `origin/main` (GitHub privado) está autorizado. El usuario actualiza la
+  Pi con `deploy/update.sh` (`git pull` + reinstalar). No hay SSH de la PC a la Pi: los comandos en
+  la Pi los corre el usuario siguiendo el README.

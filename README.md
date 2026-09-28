@@ -42,36 +42,22 @@ Solo atiende a un chat: el tuyo. Cualquier otro se ignora y queda registrado en 
 
 1. En Telegram, abre **@BotFather** y manda `/newbot`.
 2. Dale un nombre (por ejemplo, `Búho`) y un usuario que termine en `bot`.
-3. BotFather te da un **token** parecido a `123456789:AA...`. Guárdalo para el paso 3.4.
+3. BotFather te da un **token** parecido a `123456789:AA...`. Guárdalo para el paso 3.2.
    **Nunca lo pegues en un chat ni lo subas a git:** va solo en el archivo `.env` de la Pi.
 
 ## 3. Instalar Búho en la Pi
 
-El repo es privado, así que la Pi necesita una **llave de despliegue**: una llave SSH que solo
-puede leer este repo.
+El repo es público, así que la Pi lo clona por HTTPS sin llaves ni contraseñas.
 
-1. **Crea la llave en la Pi:**
-
-   ```bash
-   ssh-keygen -t ed25519 -C "buho-pi" -f ~/.ssh/id_ed25519 -N ""
-   cat ~/.ssh/id_ed25519.pub
-   ```
-
-2. **Regístrala en GitHub.** En el repo, ve a *Settings → Deploy keys → Add deploy key*, pega la
-   línea que imprimió `cat` y deja **sin marcar** *Allow write access*.
-
-3. **Clona e instala:**
+1. **Clona e instala:**
 
    ```bash
    sudo apt install -y git
    sudo mkdir -p /opt/buho && sudo chown "$USER": /opt/buho
-   git clone git@github.com:Deivid-SVG-AI/HomeBot.git /opt/buho
+   git clone https://github.com/Deivid-SVG-AI/HomeBot.git /opt/buho
    cd /opt/buho
    sudo ./deploy/install_pi.sh
    ```
-
-   La primera vez que conectes con GitHub, SSH preguntará si confías en el servidor: responde
-   `yes`.
 
    El script `install_pi.sh` se puede correr las veces que quieras sin romper nada. Hace esto:
    - instala `python3-venv` y `sqlite3` si faltan;
@@ -82,24 +68,24 @@ puede leer este repo.
    - limita journald y habilita la espera de hora sincronizada (ver la sección 7);
    - instala y habilita el servicio `buho-bot`.
 
-4. **Pon el token en `.env`:**
+2. **Pon el token en `.env`:**
 
    ```bash
    sudo nano /opt/buho/.env        # pega el token en TELEGRAM_BOT_TOKEN=
    sudo systemctl restart buho-bot
    ```
 
-5. **Obtén tu chat id.** En Telegram, abre tu bot y manda `/start`. Como `TELEGRAM_CHAT_ID` sigue
+3. **Obtén tu chat id.** En Telegram, abre tu bot y manda `/start`. Como `TELEGRAM_CHAT_ID` sigue
    vacío, Búho está en *modo configuración* y te responde con tu chat id.
 
-6. **Guarda el chat id y reinicia:**
+4. **Guarda el chat id y reinicia:**
 
    ```bash
    sudo nano /opt/buho/.env        # pega el número en TELEGRAM_CHAT_ID=
    sudo systemctl restart buho-bot
    ```
 
-7. **Comprueba que funciona.** Manda `/start` otra vez: ahora sí verás el menú de comandos. Prueba
+5. **Comprueba que funciona.** Manda `/start` otra vez: ahora sí verás el menú de comandos. Prueba
    `/clima`, `/clima manana` y `/estado`.
 
 Otras pruebas desde la Pi:

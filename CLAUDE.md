@@ -31,6 +31,6 @@ $env:BUHO_DRY_RUN=1; .venv\Scripts\python -m buho run           # simulación: i
   detenerse a revisión. No empezar la siguiente sin el OK del usuario.
 - Preguntar antes de: instalar fuera del venv, ejecutar comandos en la Pi, ampliar el alcance o
   tomar decisiones difíciles de revertir. Nunca pedir secretos en el chat: decir en qué archivo van.
-- Despliegue: hacer push a `origin/main` (GitHub privado) está autorizado. El usuario actualiza la
-  Pi con `deploy/update.sh` (`git pull` + reinstalar). No hay SSH de la PC a la Pi: los comandos en
-  la Pi los corre el usuario siguiendo el README.
+- Despliegue: hacer push a `origin/main` está autorizado (repo público en GitHub). El usuario
+  actualiza la Pi con `deploy/update.sh` (`git pull` + reinstalar). No hay SSH de la PC a la Pi:
+  los comandos en la Pi los corre el usuario siguiendo el README.

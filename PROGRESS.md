@@ -80,7 +80,7 @@ Telegram desde la Pi.
 ### Fase 1 (2026-09-27)
 
 - **Despliegue por GitHub:**
-  - El usuario clona en `/opt/buho` con una llave de despliegue de solo lectura y actualiza con
+  - El usuario clona en `/opt/buho` por HTTPS (el repo es público) y actualiza con
     `deploy/update.sh` (`git pull` + `install_pi.sh`).
   - No hay SSH de la PC a la Pi.
   - Los datos viven en `/var/lib/buho` (`StateDirectory` de systemd).
@@ -137,8 +137,9 @@ Telegram desde la Pi.
 
 ## Pendiente
 
-- **Remoto:** `origin` (github.com/Deivid-SVG-AI/HomeBot) es privado: la API de GitHub responde
-  404 sin autenticación. No se ha hecho push; se pregunta antes de cada push.
+- **Remoto:** `origin` (github.com/Deivid-SVG-AI/HomeBot) es **público** desde el 2026-09-28, por
+  decisión del usuario; ya no hace falta llave de despliegue. La especificación pedía repo privado
+  por las fixtures, que traen títulos y extractos reales de medios.
 - **Pregunta abierta:** el proyecto está en OneDrive, que sincroniza `.venv` y la BD (riesgo de
   bloqueos con WAL). Conviene moverlo o excluir esas carpetas.
 - **Fase 1, por verificar en la Pi (lo hace el usuario):**

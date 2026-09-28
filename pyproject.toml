@@ -1,0 +1,12 @@
+# Solo configuración de herramientas; las dependencias están en requirements*.txt.
+
+[tool.ruff]
+target-version = "py311"  # la Pi puede tener un Python más viejo que la PC
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
